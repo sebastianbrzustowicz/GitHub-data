@@ -14,14 +14,24 @@ The data collected from the GitHub API through various queries is as follows:
         "branchData": {
             "main": "last commit sha on this branch",
             "secondBranch": "last commit sha on this branch",
-            // more branches
         }
-},
-{
-// another repository
-},
-// more repositories
+}
 ]
+```
+
+# Launching application
+When errors occur, take into account that the application was created with:         
+- Java 21.0.1        
+- Apache Maven 3.9.5        
+- Spring Boot 3.2.2
+  
+Paste this code into console to run GitHub-data app:         
+```console
+git clone https://github.com/sebastianbrzustowicz/GitHub-data
+cd ./GitHub-data/GHData
+mvn clean install
+mvn spring-boot:run
+
 ```
 
 # Endpoint
@@ -35,7 +45,7 @@ Input in bash console:
 ```console
 curl -X GET -H "Content-Type: application/json" http://localhost:8080/GitHub/getData/sebastianbrzustowicz
 ```
-Output:
+Part of the result:
 ```json
 [
     {
@@ -65,8 +75,7 @@ Output:
         "branchData": {
             "main": "e4c49785c391ab6aab495e1c6630411d6d8656df"
         }
-    },
-// and so on
+    }
 ]
 ```
 If user is not found:    
