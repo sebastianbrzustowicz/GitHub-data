@@ -11,7 +11,7 @@ import sebastian.GHData.service.GetReposData;
 
 @Controller
 @RequestMapping("/GitHub")
-public class GitHubDataController {
+public class DataController {
 
     @Autowired
     private GetReposData getReposData;

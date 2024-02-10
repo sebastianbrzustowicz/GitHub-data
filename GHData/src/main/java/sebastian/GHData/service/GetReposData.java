@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sebastian.GHData.model.GitHubRepoData;
+import sebastian.GHData.model.RepoData;
 import sebastian.GHData.model.UserNotFound;
 import sebastian.GHData.resource.repoBranchesRequester;
 import sebastian.GHData.resource.repoListRequester;
@@ -33,9 +33,7 @@ public class GetReposData {
                         .body(notFoundResponse);
 
                 return responseEntity;
-            }
-
-            if (jsonResponse.equals("The limit of requests for the GitHub API from this IP address has been reached")) {
+            } else if (jsonResponse.equals("The limit of requests for the GitHub API from this IP address has been reached")) {
                 String requestsLimitResponse = objectMapper.writeValueAsString(new UserNotFound(403, jsonResponse));
 
                 ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
@@ -47,16 +45,16 @@ public class GetReposData {
 
             JsonNode repositories = objectMapper.readTree(jsonResponse);
 
-            List<GitHubRepoData> repoList = new ArrayList<>();
+            List<RepoData> repoList = new ArrayList<>();
 
             for (JsonNode repository : repositories) {
                 // filtering of repositories that are forks
                 if (repository.get("fork").asBoolean()) {
                     continue;
                 }
-                GitHubRepoData gitHubRepoData = new GitHubRepoData();
-                gitHubRepoData.setRepositoryName(repository.get("name").asText());
-                gitHubRepoData.setOwnerLogin(repository.get("owner").get("login").asText());
+                RepoData repoData = new RepoData();
+                repoData.setRepositoryName(repository.get("name").asText());
+                repoData.setOwnerLogin(repository.get("owner").get("login").asText());
 
                 // request all branches of repository from GitHub API
                 String repoResponse = repoBranchesRequester.sendGetRequest(username, repository.get("name").asText());
@@ -67,9 +65,9 @@ public class GetReposData {
                     branches.put(repoNode.get("name").asText(), repoNode.get("commit").get("sha").asText());
                 }
 
-                gitHubRepoData.setBranchData(branches);
+                repoData.setBranchData(branches);
 
-                repoList.add(gitHubRepoData);
+                repoList.add(repoData);
             }
 
             // Converting data to JSON

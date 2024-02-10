@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-public class GitHubRepoData {
+public class RepoData {
     // Repository variables from GitHub API
     private String repositoryName;
     private String ownerLogin;
