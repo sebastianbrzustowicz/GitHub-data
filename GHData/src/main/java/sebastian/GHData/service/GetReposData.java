@@ -35,6 +35,16 @@ public class GetReposData {
                 return responseEntity;
             }
 
+            if (jsonResponse.equals("The limit of requests for the GitHub API from this IP address has been reached")) {
+                String requestsLimitResponse = objectMapper.writeValueAsString(new UserNotFound(403, jsonResponse));
+
+                ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .header("Content-Type", "application/json")
+                        .body(requestsLimitResponse);
+
+                return responseEntity;
+            }
+
             JsonNode repositories = objectMapper.readTree(jsonResponse);
 
             List<GitHubRepoData> repoList = new ArrayList<>();

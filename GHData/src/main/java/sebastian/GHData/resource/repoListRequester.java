@@ -25,6 +25,8 @@ public class repoListRequester {
 
             if (response.statusCode() == 404) {
                 return("User not found");
+            } else if (response.statusCode() == 403) {
+                return("The limit of requests for the GitHub API from this IP address has been reached");
             }
 
             return response.body();

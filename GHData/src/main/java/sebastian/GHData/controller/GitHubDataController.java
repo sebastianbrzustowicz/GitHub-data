@@ -1,6 +1,7 @@
 package sebastian.GHData.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,7 @@ public class GitHubDataController {
     @Autowired
     private GetReposData getReposData;
 
-    @GetMapping("/getData/{username}")
+    @GetMapping(value = "/getData/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity processUsername(@PathVariable String username) {
         return getReposData.processStringToJson(username);
     }
