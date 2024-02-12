@@ -8,14 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import sebastian.GHData.service.GetAndMapData;
-import sebastian.GHData.service.GetReposData;
 
 @Controller
 @RequestMapping("/GitHub")
 public class DataController {
-
-    //@Autowired
-    //private GetReposData getReposData;
 
     @Autowired
     private GetAndMapData getAndMapData;
