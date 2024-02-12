@@ -11,7 +11,7 @@ The data collected from the GitHub API through various queries is as follows:
 {
         "repositoryName": "repository name",
         "ownerLogin": "repository owner login",
-        "size": size of repo in KB,
+        "size": "size of repo in KB",
         "branchData": {
             "main": "last commit sha on this branch",
             "secondBranch": "last commit sha on this branch"
