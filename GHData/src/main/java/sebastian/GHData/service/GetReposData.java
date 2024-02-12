@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sebastian.GHData.model.RepoData;
-import sebastian.GHData.model.UserNotFound;
+import sebastian.GHData.response.external.GitHubRestApiReposListResponse;
+import sebastian.GHData.response.inner.UserNotFound;
 import sebastian.GHData.resource.repoBranchesRequester;
 import sebastian.GHData.resource.repoListRequester;
 import java.util.ArrayList;
@@ -45,16 +45,16 @@ public class GetReposData {
 
             JsonNode repositories = objectMapper.readTree(jsonResponse);
 
-            List<RepoData> repoList = new ArrayList<>();
+            List<GitHubRestApiReposListResponse> repoList = new ArrayList<>();
 
             for (JsonNode repository : repositories) {
                 // filtering of repositories that are forks
                 if (repository.get("fork").asBoolean()) {
                     continue;
                 }
-                RepoData repoData = new RepoData();
-                repoData.setRepositoryName(repository.get("name").asText());
-                repoData.setOwnerLogin(repository.get("owner").get("login").asText());
+                GitHubRestApiReposListResponse gitHubRestApiReposListResponse = new GitHubRestApiReposListResponse();
+                gitHubRestApiReposListResponse.setRepositoryName(repository.get("name").asText());
+                gitHubRestApiReposListResponse.setOwnerLogin(repository.get("owner").get("login").asText());
 
                 // request all branches of repository from GitHub API
                 String repoResponse = repoBranchesRequester.sendGetRequest(username, repository.get("name").asText());
@@ -65,9 +65,16 @@ public class GetReposData {
                     branches.put(repoNode.get("name").asText(), repoNode.get("commit").get("sha").asText());
                 }
 
-                repoData.setBranchData(branches);
+                if (repository.get("language") != null) {
+                    gitHubRestApiReposListResponse.setSize(Integer.parseInt(repository.get("size").asText()));
+                    gitHubRestApiReposListResponse.setLanguage(repository.get("language").asText());
+                    System.out.println(repository.get("size").asText());
+                    System.out.println(repository.get("language").asText());
+                }
 
-                repoList.add(repoData);
+                gitHubRestApiReposListResponse.setBranchData(branches);
+
+                repoList.add(gitHubRestApiReposListResponse);
             }
 
             // Converting data to JSON

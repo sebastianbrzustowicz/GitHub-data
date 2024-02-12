@@ -1,4 +1,4 @@
-package sebastian.GHData.model;
+package sebastian.GHData.response.inner;
 
 import lombok.Data;
 
