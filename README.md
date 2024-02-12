@@ -11,10 +11,12 @@ The data collected from the GitHub API through various queries is as follows:
 {
         "repositoryName": "repository name",
         "ownerLogin": "repository owner login",
+        "size": size of repo in KB,
         "branchData": {
             "main": "last commit sha on this branch",
-            "secondBranch": "last commit sha on this branch",
+            "secondBranch": "last commit sha on this branch"
         }
+        "language": "major programming language"
 }
 ]
 ```
@@ -51,30 +53,29 @@ Part of the result:
     {
         "repositoryName": "CLI-users-management",
         "ownerLogin": "sebastianbrzustowicz",
-        "branchData": {
+        "size": 124,
+        "branches": {
             "main": "0b025cbda0e64803e1e81f336b469111a5ff9d26"
-        }
+        },
+        "language": "Python"
     },
     {
         "repositoryName": "Data-scraping-webapp",
         "ownerLogin": "sebastianbrzustowicz",
-        "branchData": {
+        "size": 25,
+        "branches": {
             "main": "48211a610cdd1cb7865694044f40f0f75a2aa076"
-        }
+        },
+        "language": "Python"
     },
     {
         "repositoryName": "E-commerce-API-with-AI-assistant",
         "ownerLogin": "sebastianbrzustowicz",
-        "branchData": {
+        "size": 151,
+        "branches": {
             "main": "8a5773e673e20c98c7a2cc53eea0374b301c96e0"
-        }
-    },
-    {
-        "repositoryName": "Flight-quality-overview-microservice",
-        "ownerLogin": "sebastianbrzustowicz",
-        "branchData": {
-            "main": "e4c49785c391ab6aab495e1c6630411d6d8656df"
-        }
+        },
+        "language": "Java"
     }
 ]
 ```
