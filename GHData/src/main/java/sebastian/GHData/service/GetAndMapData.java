@@ -13,6 +13,7 @@ import sebastian.GHData.response.external.RepoObject;
 import sebastian.GHData.response.inner.UserNotFound;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,26 +23,33 @@ public class GetAndMapData {
         try {
 
             // request all user's repositories from GitHub API
-            String jsonReposResponse = repoListRequester.sendGetRequest(username);
+            Map<String, Integer> jsonReposResponse = repoListRequester.sendGetRequest(username);
+            String body = jsonReposResponse.keySet().iterator().next();
+            Integer satusCode = jsonReposResponse.get(body);
 
-            assert jsonReposResponse != null;
-            if (jsonReposResponse.equals("User not found")) {
-                return userNotFound(jsonReposResponse);
-            } else if (jsonReposResponse.equals("The limit of requests")) {
-                return requestsLimit(jsonReposResponse);
+            assert body != null;
+            if (satusCode.equals(404) || satusCode.equals(403)) {
+                return handleBasicErrors(body, satusCode);
             }
 
             ObjectMapper mapper = new ObjectMapper();
 
-            List<RepoObject> modifiedRepos = mapper.readValue(jsonReposResponse, new TypeReference<List<RepoObject>>(){})
+            List<RepoObject> modifiedRepos = mapper.readValue(body, new TypeReference<List<RepoObject>>(){})
                     .stream()
                     .filter(repo -> repo.getFork().equals("false"))
                     .peek(repo -> repo.setFork(null))
                     .map(repo -> {
-                        String repoResponse = repoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
+                        Map<String, Integer> repoBranchResponse = repoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
+                        String bodyBranch = repoBranchResponse.keySet().iterator().next();
+                        Integer satusCodeBranch = repoBranchResponse.get(body);
+                        assert bodyBranch != null;
+                        if (satusCodeBranch.equals(404) || satusCodeBranch.equals(403)) {
+                            return repo;
+                        }
+
                         ObjectMapper mapperBranch = new ObjectMapper();
                         try {
-                            JsonNode jsonBranches = mapperBranch.readTree(repoResponse);
+                            JsonNode jsonBranches = mapperBranch.readTree(bodyBranch);
                             HashMap<String, String> branchesMap = new HashMap<>();
                             for (JsonNode branch : jsonBranches) {
                                 branchesMap.put(branch.get("name").asText(), branch.get("commit").get("sha").asText());
@@ -69,26 +77,37 @@ public class GetAndMapData {
         }
     }
 
-    public ResponseEntity<String> userNotFound(String json) throws JsonProcessingException {
+    private ResponseEntity<String> handleBasicErrors(String body, Integer satusCode) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        String notFoundResponse = mapper.writeValueAsString(new UserNotFound(404, json));
+        String notFoundResponse = mapper.writeValueAsString(new UserNotFound(satusCode, body));
 
-        ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.NOT_FOUND)
+        ResponseEntity<String> responseEntity = ResponseEntity.status(satusCode)
                 .header("Content-Type", "application/json")
                 .body(notFoundResponse);
 
         return responseEntity;
     }
 
-    public ResponseEntity<String> requestsLimit(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        String requestsLimitResponse = mapper.writeValueAsString(new UserNotFound(403, json));
-
-        ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                .header("Content-Type", "application/json")
-                .body(requestsLimitResponse);
-
-        return responseEntity;
-    }
+    //public ResponseEntity<String> userNotFound(String json) throws JsonProcessingException {
+    //    ObjectMapper mapper = new ObjectMapper();
+    //    String notFoundResponse = mapper.writeValueAsString(new UserNotFound(404, json));
+//
+    //    ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.NOT_FOUND)
+    //            .header("Content-Type", "application/json")
+    //            .body(notFoundResponse);
+//
+    //    return responseEntity;
+    //}
+//
+    //public ResponseEntity<String> requestsLimit(String json) throws JsonProcessingException {
+    //    ObjectMapper mapper = new ObjectMapper();
+    //    String requestsLimitResponse = mapper.writeValueAsString(new UserNotFound(403, json));
+//
+    //    ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+    //            .header("Content-Type", "application/json")
+    //            .body(requestsLimitResponse);
+//
+    //    return responseEntity;
+    //}
 
 }
