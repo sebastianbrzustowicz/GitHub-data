@@ -55,13 +55,15 @@ class GhDataApplicationTests {
 
 	@Test
 	public void testProcessCorrectUserStatusCode() throws Exception {
-		String username = "dummy011";
+		String username = "sebastianbrzustowicz";
 
-		//String jsonResponse = "{\"name\":\"main\",\"commit\":{\"sha\":\"55c12e78eb6d5c267c0263e244a6e45ccf4507b9\",\"url\":\"https\"},\"protected\":false}";
+		String jsonResponse = "{\"name\":\"main\",\"commit\":{\"sha\":\"55c12e78eb6d5c267c0263e244a6e45ccf4507b9\",\"url\":\"https...some_url\"},\"protected\":false}";
 
-		//Map<String, Integer> mockResponse = Map.of(jsonResponse, 200);
+		Map<String, Integer> mockResponse = Map.of(jsonResponse, 200);
 
-		//Mockito.when(RepoBranchesRequester.sendGetRequest(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenReturn(mockResponse);
+		RepoBranchesRequester repoBranchesRequester = Mockito.mock(RepoBranchesRequester.class);
+		Mockito.when(repoBranchesRequester.sendGetRequest(ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+				.thenReturn(mockResponse);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/GitHub/getData/{username}", username)
 						.contentType(MediaType.APPLICATION_JSON_VALUE)

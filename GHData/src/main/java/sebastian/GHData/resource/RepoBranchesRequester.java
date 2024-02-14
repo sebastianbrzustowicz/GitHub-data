@@ -1,5 +1,7 @@
 package sebastian.GHData.resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,12 +11,14 @@ import java.util.Map;
 public class RepoBranchesRequester {
     // Request to GitHub API for repository branches
 
-    public static Map<String, Integer> sendGetRequest(String username, String repoName) {
+    @Autowired
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+
+    public Map<String, Integer> sendGetRequest(String username, String repoName) {
 
         try {
             String apiUrl = "https://api.github.com/repos/" + username + "/" + repoName + "/branches";
-
-            HttpClient httpClient = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))

@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class GetAndMapData {
 
+    RepoBranchesRequester repoBranchesRequester = new RepoBranchesRequester();
+
     public ResponseEntity<String> processStringToJson(String username) {
         try {
 
@@ -40,7 +42,7 @@ public class GetAndMapData {
                     .filter(repo -> repo.getFork().equals("false"))
                     .peek(repo -> repo.setFork(null))
                     .map(repo -> {
-                        Map<String, Integer> repoBranchResponse = RepoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
+                        Map<String, Integer> repoBranchResponse = repoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
                         String bodyBranch = repoBranchResponse.keySet().iterator().next();
                         Integer satusCodeBranch = repoBranchResponse.get(bodyBranch);
                         assert bodyBranch != null;
