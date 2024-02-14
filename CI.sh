@@ -15,7 +15,7 @@ if [ $? -eq 0 ]; then
 	cd ..
 	echo "Tests completed succesfully"
 	git add .
-	git commit -m "Automated software integration"
+	git commit -m "Adding parallel requests and some tests"
 	git push origin main
 	
 	echo "Software uploaded to remote repository"

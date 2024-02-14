@@ -6,13 +6,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
-public class repoListRequester {
-    // Request to GitHub API for list of repositories
+public class RepoBranchesRequester {
+    // Request to GitHub API for repository branches
 
-    public static Map<String, Integer> sendGetRequest(String username) {
+    public static Map<String, Integer> sendGetRequest(String username, String repoName) {
 
         try {
-            String apiUrl = "https://api.github.com/users/" + username + "/repos";
+            String apiUrl = "https://api.github.com/repos/" + username + "/" + repoName + "/branches";
 
             HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -24,12 +24,6 @@ public class repoListRequester {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 404) {
-                return Map.of("User not found", response.statusCode());
-            } else if (response.statusCode() == 403) {
-                return Map.of("The limit of requests for the GitHub API from this IP address has been reached", response.statusCode());
-            }
-
             return Map.of(response.body(), response.statusCode());
 
         } catch (Exception e) {
@@ -38,5 +32,4 @@ public class repoListRequester {
 
         return null;
     }
-
 }

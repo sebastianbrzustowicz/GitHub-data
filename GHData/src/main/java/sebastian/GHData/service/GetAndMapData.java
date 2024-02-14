@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sebastian.GHData.resource.repoBranchesRequester;
-import sebastian.GHData.resource.repoListRequester;
+import sebastian.GHData.resource.RepoBranchesRequester;
+import sebastian.GHData.resource.RepoListRequester;
 import sebastian.GHData.response.external.RepoObject;
 import sebastian.GHData.response.inner.UserNotFound;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class GetAndMapData {
         try {
 
             // request all user's repositories from GitHub API
-            Map<String, Integer> jsonReposResponse = repoListRequester.sendGetRequest(username);
+            Map<String, Integer> jsonReposResponse = RepoListRequester.sendGetRequest(username);
             String body = jsonReposResponse.keySet().iterator().next();
             Integer satusCode = jsonReposResponse.get(body);
 
@@ -36,12 +36,13 @@ public class GetAndMapData {
 
             List<RepoObject> modifiedRepos = mapper.readValue(body, new TypeReference<List<RepoObject>>(){})
                     .stream()
+                    .parallel()
                     .filter(repo -> repo.getFork().equals("false"))
                     .peek(repo -> repo.setFork(null))
                     .map(repo -> {
-                        Map<String, Integer> repoBranchResponse = repoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
+                        Map<String, Integer> repoBranchResponse = RepoBranchesRequester.sendGetRequest(repo.getOwnerLogin(), repo.getRepositoryName());
                         String bodyBranch = repoBranchResponse.keySet().iterator().next();
-                        Integer satusCodeBranch = repoBranchResponse.get(body);
+                        Integer satusCodeBranch = repoBranchResponse.get(bodyBranch);
                         assert bodyBranch != null;
                         if (satusCodeBranch.equals(404) || satusCodeBranch.equals(403)) {
                             return repo;
